@@ -22,6 +22,7 @@ class Rainbows::EventMachineThreadPool::Client <
         }
         if @hp.hijacked?
           @deferred = nil
+          hijacked
         elsif nil == status || -1 == status
           @deferred = true
         else
