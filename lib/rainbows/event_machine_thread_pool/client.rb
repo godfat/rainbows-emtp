@@ -21,7 +21,7 @@ class Rainbows::EventMachineThreadPool::Client <
           APP.call(@env.merge!(RACK_DEFAULTS))
         }
         if @hp.hijacked?
-          @deferred = nil
+          @deferred = nil # User must handle everything by themselves
           hijacked
         elsif nil == status || -1 == status
           @deferred = true
