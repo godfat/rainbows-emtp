@@ -27,7 +27,7 @@ Here's a Rainbows! config example:
 
 ``` ruby
 Rainbows! do
-  use :EventMachineThreadPool
+  use :EventMachineThreadPool, :pool_size => 10
 end
 ```
 
