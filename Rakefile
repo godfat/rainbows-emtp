@@ -8,7 +8,7 @@ desc 'Generate gemspec'
 task 'gem:spec' do
   Gemgem.spec = Gemgem.create do |s|
     s.name    = 'rainbows-emtp'
-    s.version = '0.5.0'
+    s.version = '0.5.1'
 
     %w[rainbows eventmachine].each{ |g| s.add_runtime_dependency(g) }
   end
