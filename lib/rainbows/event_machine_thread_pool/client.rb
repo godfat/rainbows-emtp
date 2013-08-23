@@ -31,8 +31,11 @@ class Rainbows::EventMachineThreadPool::Client <
         end
       # Never ever crash any thread
       rescue Exception => e
-        if handler = EM.instance_variable_get(:@error_handler)
-          handler.call(e)
+        begin # Any user codes should be guarded
+          if handler = EM.instance_variable_get(:@error_handler)
+            handler.call(e)
+          end
+        rescue Exception
         end
         handle_error(e)
       end
