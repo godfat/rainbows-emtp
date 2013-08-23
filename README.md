@@ -31,6 +31,11 @@ Rainbows! do
 end
 ```
 
+## CAVEAT:
+
+This does not work for large chunked pipelined requests for now.
+If you don't know what's that, then probably you're not using it anyway.
+
 ## CONTRIBUTORS:
 
 * Lin Jen-Shin (@godfat)
