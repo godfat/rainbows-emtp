@@ -1,3 +1,4 @@
+# -*- encoding: binary -*-
 
 require 'rainbows'
 
@@ -6,8 +7,9 @@ module Rainbows::EventMachineThreadPool
   extend  Rainbows::PoolSize
   include Rainbows::EventMachine
 
-  def init_worker_process worker
+  def init_worker_process(worker)
     EM.threadpool_size = Rainbows::O[:pool_size]
+    logger.info "EventMachineThreadPool pool_size=#{Rainbows::O[:pool_size]}"
     super
   end
 end

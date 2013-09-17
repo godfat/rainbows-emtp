@@ -1,44 +1,47 @@
-
-require 'rainbows/event_machine_thread_pool'
-
+# -*- encoding: binary -*-
+# :enddoc:
 class Rainbows::EventMachineThreadPool::Client <
       Rainbows::EventMachine::Client
 
+  def app_dispatch
+    EM.defer(method(:app_response), method(:response_write))
+  end
+
   def app_call input
-    # begin Copied from Rainbows::EventMachine::Client#app_call
+    @deferred = true # we defer immediately
     set_comm_inactivity_timeout 0
     @env[RACK_INPUT] = input
     @env[REMOTE_ADDR] = @_io.kgio_addr
     @env[ASYNC_CALLBACK] = method(:write_async_response)
     @env[ASYNC_CLOSE] = EM::DefaultDeferrable.new
     @hp.hijack_setup(@env, @_io)
-    # end Copied from Rainbows::EventMachine::Client#app_call
-
-    @deferred = true # We defer immediately
-    EM.defer do      # Queue the application call to EM's job queue
-      begin
-        status, headers, body = catch(:async) {
-          APP.call(@env.merge!(RACK_DEFAULTS))
-        }
-        if @hp.hijacked?
-          @deferred = nil # User must handle everything by themselves
-          hijacked
-        elsif nil == status || -1 == status
-          @deferred = true
-        else
-          @deferred = nil
-          ev_write_response(status, headers, body, @hp.next?)
-        end
-      # Never ever crash any thread
-      rescue Exception => e
-        begin # Any user codes should be guarded
-          if handler = EM.instance_variable_get(:@error_handler)
-            handler.call(e)
-          end
-        rescue Exception
-        end
-        handle_error(e)
-      end
-    end
+    app_dispatch # must be implemented by subclass
   end
+
+  # this is only called in the master thread
+  def response_write(response)
+    if @hp.hijacked?
+      @deferred = nil
+      hijacked
+    elsif nil == response[0] || -1 == response[0]
+      @deferred = true
+    else
+      @deferred = nil
+      ev_write_response(*response, @hp.next?)
+    end
+    rescue => e
+      @deferred = nil
+      handle_error(e)
+  end
+
+  # fails-safe application dispatch, we absolutely cannot
+  # afford to fail or raise an exception (killing the thread)
+  # here because that could cause a deadlock and we'd leak FDs
+  def app_response
+    APP.call(@env.merge!(RACK_DEFAULTS))
+    rescue => e
+      Rainbows::Error.app(e) # we guarantee this does not raise
+      [ 500, {}, [] ]
+  end
+
 end
