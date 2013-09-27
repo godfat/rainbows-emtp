@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Lin Jen-Shin (godfat)"]
-  s.date = "2013-09-17"
+  s.date = "2013-09-28"
   s.description = "EventMachineThreadPool model for Rainbows!"
   s.email = ["godfat (XD) godfat.org"]
   s.files = [
@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.homepage = "https://github.com/godfat/rainbows-emtp"
   s.licenses = ["Apache License 2.0"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "2.1.3"
+  s.rubygems_version = "2.1.5"
   s.summary = "EventMachineThreadPool model for Rainbows!"
 
   if s.respond_to? :specification_version then
